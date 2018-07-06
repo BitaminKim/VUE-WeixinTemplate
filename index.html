@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>微信</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, minimum-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="keywords" />
+	<meta name="description" />
+	<link rel="stylesheet" href="css/css.css">
+	<script src="js/jquery.min.js"></script>
+	<script src="js/vue.js"></script>
+</head>
+<body style=" padding:15px;">
+
+<div v-cloak id="app" class="cainavcon">
+    <div class="menuarea">
+        <div class="menuarea_tit">汇众社区</div>
+        <div class="mobile_nav">
+            <ul class="premenu_list premenu_list1 premenu_list2 premenu_list3">
+            	<li v-for="(item, index) in menu.list" :class="['premenu_li'+ menu.list.length]">
+		            <a href="javascript:void(0);" @click="activeSelected(item.id)" class="prelink_left_a" :class="{prelink_a : isActive(item.id)}">
+		                <span>{{item.name}}</span>
+		            </a>
+		            <div class="ziprenav" :class="{active : isActive(item.id)}">
+		                <ul class="ziprenav_ul">
+		                	<li v-for="(value, key) in item.list" :class="{current : isCurrent(value.id)}">
+		                        <a href="javascript:void(0);" @click="currentSelected(value.id)"><span>{{value.name}}</span></a>
+		                    </li>
+		                    <li class="preadd" :style="item.list.length == 5 ? 'display:none' : ''">
+		                        <a href="javascript:void(0);" @click="twoLevelMenuAdd(item.id)" title="最多添加5个子菜单"><span><i></i></span></a>
+		                    </li>
+		                </ul>
+		                <i class="arrow arrow_out"></i>
+		                <i class="arrow arrow_in"></i>
+		            </div>
+		        </li>
+		        
+                <li class="proadd" :class="['premenu_li'+ (menu.list.length > 0 ? menu.list.length : '')]">
+                    <a href="javascript:void(0);" @click="oneLevelMenuAdd" :class="['prelink_left_a', menu.list.length == 0 ? 'prelink_a' : '' ]" title="最多添加3个一级菜单">
+                    	<i></i>
+                        <span v-if="menu.list.length == 0">菜单名称</span>
+                    </a>
+                </li>
+            </ul> 
+        </div>
+        
+    </div>
+    
+    <menu-content :menu="menu" :menu-object="menuObject"></menu-content>
+    <script type="text/x-template" id="menu-content">
+    	
+		<div>
+			<div class="menu_initial_tips" v-if="menuObject.id == null" >点击左侧菜单进行编辑操作</div>
+	    	<div class="cairig_con" v-else>
+	        	<div class="caidan_tit"><a href="javascript:void(0);" @click="removeMenu(menuObject.id)">删除菜单 ID:{{menuObject.id}}</a><span>{{menuObject.name}}</span></div>
+	            <div class="caidan_put">
+	            	<h1>菜单名称</h1>
+	                <input type="text" v-model="menuObject.name">
+	                <span>字数不能超过4个汉字或8个字母</span>
+	            </div>
+	            <div class="caidan_dxnav">
+	            	<h1>菜单内容</h1>
+	                <label><input type="radio" v-model="menuObject.menuType" value="msg"><span>发送消息</span></label>
+	                <label><input type="radio" v-model="menuObject.menuType" value="link"><span>跳转链接</span></label>
+	           	</div>
+	            <div class="liunav" v-if="menuObject.menuType == 'msg'">
+	            	<div class="liunav_nav">
+	                	<a @click="menuObject.contentType = 'pictext'" class="a_nav1" :class="menuObject.contentType == 'pictext' ? 'curre' : ''">图文消息</a>
+	                    <a @click="menuObject.contentType = 'text'" class="a_nav2" :class="menuObject.contentType == 'text' ? 'curre' : ''">文字</a>
+	                    <a @click="menuObject.contentType = 'pic'" class="a_nav3" :class="menuObject.contentType == 'pic' ? 'curre' : ''">图片</a>
+	                </div>
+	                <div class="liunav_file" v-if="menuObject.contentType == 'pictext'">
+	                	<a href="#" class="adda_1">
+	                        <i></i>
+	                        <span>从素材库选择</span>
+	                    </a>
+	                    <a href="#" class="adda_2">
+	                        <i></i>
+	                        <span>自建图文</span>
+	                    </a>
+	                </div>
+	                <div class="liunav_form" v-if="menuObject.contentType == 'text'">
+	                	<textarea v-model="menuObject.content" placeholder="请输入文字内容！"></textarea>
+	                    <h1>最多只允许输入{{menuObject.content != null ? 600 - menuObject.content.length : "600"}}个字</h1>
+	                </div>
+	                <div class="liunav_file" v-if="menuObject.contentType == 'pic'">
+	                	<a href="#" class="adda_1">
+	                        <i></i>
+	                        <span>从素材库选择</span>
+	                    </a>
+	                    <a href="#" class="adda_3">
+	                        <i></i>
+	                        <span>上传图片</span>
+	                    </a>
+	                </div>
+	            </div>
+	            <div class="liunav liunav2" v-if="menuObject.menuType == 'link'">
+	            	<div class="liunav2_tit">订阅者点击该子菜单会跳到以下链接</div>
+	            	<div class="liunav2_put">
+	                    <h1>页面地址</h1>
+	                    <input type="text">
+	                    <a>从公众号图文消息中选择</a>
+	                </div>
+	            </div>
+	            <span class="left_span"><i></i></span>
+	        </div>
+	        <div class="caibotsub"><button>保存并发布</button><a href="javascript:void(0);">预览</a></div>
+	        <pre>{{JSON.stringify(menu, null,7)}}</pre>
+	    </div>
+    </script>
+    
+    
+</div>
+<script src="js/wxmenu.js"></script>
+</body>
+</html>
